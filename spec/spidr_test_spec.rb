@@ -2,6 +2,9 @@ require 'spec_helper'
 require 'spidr_test'
 
 RSpec.describe SpidrTest do
+  before(:all) { SpidrTest::Server.start(TestRackApp) }
+  after(:all) { SpidrTest::Server.stop(TestRackApp) }
+
   it 'invokes test app' do
     expect(TestRackApp).to receive(:call)
 

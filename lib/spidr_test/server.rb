@@ -2,11 +2,39 @@ require 'rack'
 
 class SpidrTest
   class Server
-    def self.run(app)
-      server = self.new(app)
-      server.start!
-      yield server
+    def self.servers
+      @servers ||= {}
+    end
+
+    def self.start(app)
+      if servers[app]
+        $stderr.puts "Already started server for #{app}"
+        return
+      end
+
+      servers[app] = self.new(app)
+      servers[app].start!
+    end
+
+    def self.stop(app)
+      server = servers[app]
+      if server.nil?
+        $stderr.puts "Did not locate server for #{app}"
+        return
+      end
+
       server.stop!
+    end
+
+    def self.run(app)
+      if self.servers[app]
+        yield self.servers[app]
+      else
+        server = self.new(app)
+        server.start!
+        yield server
+        server.stop!
+      end
     end
 
     def initialize(app)
