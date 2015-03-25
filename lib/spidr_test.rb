@@ -1,3 +1,5 @@
+require 'spidr'
+
 class SpidrTest
   autoload :Server, 'spidr_test/server'
 
@@ -19,7 +21,7 @@ class SpidrTest
 
   def run!
     Server.run(app) do |server|
-      `curl #{server.url}`
+      Spidr.site(server.url)
     end
   end
 end
