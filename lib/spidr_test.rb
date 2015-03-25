@@ -3,23 +3,20 @@ require 'spidr'
 class SpidrTest
   autoload :Server, 'spidr_test/server'
 
-  def self.crawl(context, &block)
-    spidr_test = SpidrTest.new(context)
-    spidr_test.config(&block)
-    spidr_test.run!
+  def self.crawl(&block)
+    spidr_test = SpidrTest.new(&block)
+    spidr_test.crawl!
   end
 
   attr_accessor :app
 
-  def initialize(context)
-    @context = context
+  def initialize
+    if block_given?
+      yield self
+    end
   end
 
-  def config
-    yield self
-  end
-
-  def run!
+  def crawl!
     Server.run(app) do |server|
       Spidr.site(server.url)
     end
