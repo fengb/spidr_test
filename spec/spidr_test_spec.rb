@@ -22,4 +22,14 @@ RSpec.describe SpidrTest do
 
     expect(crawled).to contain_exactly('/', '/foo', '/bar')
   end
+
+  it 'generates the bodies' do
+    pages = {}
+    subject.spidr.every_page do |page|
+      pages[page.url.path] = page.body
+    end
+    subject.crawl!
+
+    expect(pages).to include('/foo' => 'Foo', '/bar' => 'Bar')
+  end
 end

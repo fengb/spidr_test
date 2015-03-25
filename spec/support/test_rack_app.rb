@@ -8,6 +8,6 @@ class TestRackApp < Sinatra::Base
   end
 
   get '/:route' do
-    params[:route]
+    params[:route].capitalize
   end
 end
