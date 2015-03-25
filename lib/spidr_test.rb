@@ -1,4 +1,6 @@
 class SpidrTest
+  autoload :Server, 'spidr_test/server'
+
   def self.crawl(context, &block)
     spidr_test = SpidrTest.new(context)
     spidr_test.config(&block)
@@ -16,6 +18,8 @@ class SpidrTest
   end
 
   def run!
-    app.call({})
+    Server.run(app) do |server|
+      `curl #{server.url}`
+    end
   end
 end
