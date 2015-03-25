@@ -1,5 +1,7 @@
-class TestRackApp
-  def self.call(env)
-    [200, {}, 'Hello World']
+require 'sinatra'
+
+class TestRackApp < Sinatra::Base
+  get '/' do
+    'Hello World!'
   end
 end
