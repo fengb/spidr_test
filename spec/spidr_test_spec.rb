@@ -23,7 +23,7 @@ RSpec.describe SpidrTest do
       end
     end
 
-    expect(crawled).to contain_exactly('/', '/foo', '/bar')
+    expect(crawled).to contain_exactly('/', '/status/200', '/status/404', '/status/500')
   end
 
   it 'generates the bodies' do
@@ -36,20 +36,7 @@ RSpec.describe SpidrTest do
       end
     end
 
-    expect(pages).to include('/foo' => 'Foo', '/bar' => 'Bar')
-  end
-
-  it 'generates the bodies' do
-    bodies = {}
-
-    SpidrTest.crawl do |test|
-      test.app = TestRackApp
-      test.spidr.every_page do |page|
-        bodies[page.url.path] = page.body
-      end
-    end
-
-    expect(bodies).to include('/foo' => 'Foo', '/bar' => 'Bar')
+    expect(pages).to include('/status/200' => '200', '/status/404' => '404', '/status/500' => '500')
   end
 
   it 'detects status codes' do
@@ -57,7 +44,6 @@ RSpec.describe SpidrTest do
 
     SpidrTest.crawl do |test|
       test.app = TestRackApp
-      test.path = '/status/common'
       test.spidr.every_page do |page|
         codes[page.url.path] = page.code
       end
