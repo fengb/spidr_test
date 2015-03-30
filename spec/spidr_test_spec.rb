@@ -14,29 +14,29 @@ RSpec.describe SpidrTest do
   end
 
   it 'hits all routes' do
-    crawled = []
+    routes = []
 
     SpidrTest.crawl do |test|
       test.app = TestRackApp
       test.spidr.every_page do |page|
-        crawled << page.url.path
+        routes << page.url.path
       end
     end
 
-    expect(crawled).to contain_exactly('/', '/status/200', '/status/404', '/status/500')
+    expect(routes).to contain_exactly('/', '/status/200', '/status/404', '/status/500')
   end
 
   it 'generates the bodies' do
-    pages = {}
+    bodies = {}
 
     SpidrTest.crawl do |test|
       test.app = TestRackApp
       test.spidr.every_page do |page|
-        pages[page.url.path] = page.body
+        bodies[page.url.path] = page.body
       end
     end
 
-    expect(pages).to include('/status/200' => '200', '/status/404' => '404', '/status/500' => '500')
+    expect(bodies).to include('/status/200' => '200', '/status/404' => '404', '/status/500' => '500')
   end
 
   it 'detects status codes' do
