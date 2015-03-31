@@ -5,14 +5,6 @@ RSpec.describe SpidrTest do
   before(:all) { SpidrTest::Server.start(TestRackApp) }
   after(:all) { SpidrTest::Server.stop(TestRackApp) }
 
-  it 'invokes test app' do
-    expect(TestRackApp).to receive(:call)
-
-    SpidrTest.crawl do |test|
-      test.app = TestRackApp
-    end
-  end
-
   it 'hits all routes' do
     routes = []
 
@@ -23,7 +15,7 @@ RSpec.describe SpidrTest do
       end
     end
 
-    expect(routes).to contain_exactly('/', '/status/200', '/status/404', '/status/500')
+    expect(routes).to contain_exactly('/', '/status/200', '/status/404')
   end
 
   it 'generates the bodies' do
@@ -36,7 +28,7 @@ RSpec.describe SpidrTest do
       end
     end
 
-    expect(bodies).to include('/status/200' => '200', '/status/404' => '404', '/status/500' => '500')
+    expect(bodies).to include('/status/200' => '200', '/status/404' => '404')
   end
 
   it 'detects status codes' do
@@ -49,6 +41,21 @@ RSpec.describe SpidrTest do
       end
     end
 
-    expect(codes).to include('/status/200' => 200, '/status/404' => 404, '/status/500' => 500)
+    expect(codes).to include('/status/200' => 200, '/status/404' => 404)
+  end
+
+  it 'handles successes and failures' do
+    successes = []
+    failures = []
+
+    SpidrTest.crawl do |test|
+      test.app = TestRackApp
+      test.path = '/with-500'
+      test.success { |page| successes << page.url.path }
+      test.failure { |page| failures << page.url.path }
+    end
+
+    expect(successes).to include('/status/200', '/status/404')
+    expect(failures).to include('/status/500')
   end
 end
