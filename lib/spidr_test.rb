@@ -4,21 +4,27 @@ class SpidrTest
   autoload :Server, 'spidr_test/server'
   autoload :Capturer, 'spidr_test/capturer'
 
-  NOOP = Proc.new{}
+  SUCCESS_HANDLER = ->(page){}
+  FAILURE_HANDLER = ->(page){ raise "Failure on #{page.url.path}: #{page.body}" }
+  ERROR_HANDLER = ->(url) { raise "Cannot connect to #{url.path}" }
 
   attr_accessor :app, :spidr, :path
 
-  def self.crawl(&block)
-    spidr_test = SpidrTest.new(&block)
+  def self.crawl(options = {}, &block)
+    spidr_test = SpidrTest.new(options, &block)
     spidr_test.crawl!
   end
 
-  def initialize
+  def initialize(options)
     @spidr = Capturer.new
     @path = '/'
-    @success_handler = NOOP
-    @failure_handler = ->(page){ raise "Failure on #{page.url.path}: #{page.body}" }
-    @error_handler = ->(url) { raise "Cannot connect to #{url.path}" }
+    @success_handler = SUCCESS_HANDLER
+    @failure_handler = FAILURE_HANDLER
+    @error_handler = ERROR_HANDLER
+
+    options.each do |key, val|
+      self.send("#{key}=", val)
+    end
 
     yield self if block_given?
   end
@@ -38,6 +44,21 @@ class SpidrTest
           end
         end
       end
+    end
+  end
+
+  def context=(context)
+    @context = context
+    success do |page|
+      context.specify(page.url.path) { SUCCESS_HANDLER.call(page) }
+    end
+
+    failure do |page|
+      context.specify(page.url.path) { FAILURE_HANDLER.call(page) }
+    end
+
+    error do |url|
+      context.specify(page.url.path) { ERROR_HANDLER.call(page) }
     end
   end
 
