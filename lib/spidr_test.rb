@@ -32,27 +32,13 @@ class SpidrTest
   end
 
   def crawl!
-    test = self
     capturer = self.spidr
     Server.run(app) do |server|
       Spidr.site(server.url + path) do |spidr|
         capturer._invoke(spidr)
 
-        spidr.every_failed_url do |url|
-          @test_define.call(url) do
-            test.error_handler.call(url, nil)
-          end
-        end
-
-        spidr.every_page do |page|
-          @test_define.call(page.url) do
-            if test.success?(page)
-              test.success_handler.call(page.url, page)
-            else
-              test.failure_handler.call(page.url, page)
-            end
-          end
-        end
+        spidr.every_failed_url(&method(:failed_url))
+        spidr.every_page(&method(:check_page))
       end
     end
   end
@@ -65,6 +51,26 @@ class SpidrTest
     @context = context
     @test_define = ->(url, &block) do
       context.specify(url.path, &block)
+    end
+  end
+
+  private
+
+  def failed_url(url)
+    error_handler = @error_handler
+    @test_define.call(url) do
+      @error_handler.call(url, nil)
+    end
+  end
+
+  def check_page(page)
+    test = self
+    @test_define.call(page.url) do
+      if test.success?(page)
+        test.success_handler.call(page.url, page)
+      else
+        test.failure_handler.call(page.url, page)
+      end
     end
   end
 end
