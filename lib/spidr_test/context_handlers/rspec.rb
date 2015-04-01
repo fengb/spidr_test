@@ -8,15 +8,15 @@ if defined?(::RSpec::Core::ExampleGroup)
       @context = context
     end
 
-    def success(url, page)
+    def success(url, page, msg)
     end
 
-    def failure(url, page)
-      raise "Failure on #{url}: #{page.body}"
+    def failure(url, page, msg)
+      raise msg
     end
 
-    def error(url, page)
-      raise "Cannot connect to #{url}"
+    def error(url, page, msg)
+      raise msg
     end
   end
 end

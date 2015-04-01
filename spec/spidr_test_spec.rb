@@ -51,8 +51,8 @@ RSpec.describe SpidrTest do
     SpidrTest.crawl do |test|
       test.app = TestRackApp
       test.path = '/with-500'
-      test.success_handler = ->(url, page) { successes << url.path }
-      test.failure_handler = ->(url, page) { failures << url.path }
+      test.success_handler = ->(url, page, msg) { successes << url.path }
+      test.failure_handler = ->(url, page, msg) { failures << url.path }
     end
 
     expect(successes).to include('/status/200', '/status/404')

@@ -8,16 +8,16 @@ if defined?(::Minitest::Test)
       @context = context
     end
 
-    def success(url, page)
+    def success(url, page, msg)
       @context.pass url
     end
 
-    def failure(url, page)
-      @context.failures << assertion("Failure on #{url}: #{page.body}")
+    def failure(url, page, msg)
+      @context.failures << assertion(msg)
     end
 
-    def error(url, page)
-      @context.failures << assertion("Cannot connect to #{url}")
+    def error(url, page, msg)
+      @context.failures << assertion(msg)
     end
 
     def assertion(msg)
