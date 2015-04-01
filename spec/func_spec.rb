@@ -13,7 +13,8 @@ RSpec.describe SpidrTest, 'func' do
                       path: '/with-500',
                       context: self,
                       failure_handler: ->(url, page) do
-                        pending { SpidrTest::DEFAULT[:test_handler].call(url, page) }
+                        pending 'expecting 500 error'
+                        SpidrTest::DEFAULT[:failure_handler].call(url, page)
                       end
     end
   end

@@ -67,7 +67,7 @@ class SpidrTest
   def failed_url(url)
     error_handler = @error_handler
     @test_define.call(url) do
-      @error_handler.call(url, nil)
+      error_handler.call(url, nil)
     end
   end
 
@@ -75,9 +75,9 @@ class SpidrTest
     test = self
     @test_define.call(page.url) do
       if test.success?(page)
-        test.success_handler.call(page.url, page)
+        self.instance_exec(page.url, page, &test.success_handler)
       else
-        test.failure_handler.call(page.url, page)
+        self.instance_exec(page.url, page, &test.failure_handler)
       end
     end
   end
