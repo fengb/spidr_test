@@ -42,18 +42,18 @@ class SpidrTest
 
     def initialize(app)
       @app = app
-      @port = 43198
     end
 
     def url
-      "http://localhost:#{@port}"
+      "http://localhost:#{@thread[:port]}"
     end
 
     def start!
       mutex = Mutex.new
       server_ready = ConditionVariable.new
       @thread = Thread.new do
-        Rack::Handler::WEBrick.run(@app, Port: @port, Logger: NULL_LOGGER, AccessLog: []) do
+        Rack::Handler::WEBrick.run(@app, Port: 0, Logger: NULL_LOGGER, AccessLog: []) do |server|
+          Thread.current[:port] = server.config[:Port]
           mutex.synchronize { server_ready.signal }
         end
       end
