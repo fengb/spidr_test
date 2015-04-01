@@ -4,11 +4,16 @@ class SpidrTest
   autoload :Server, 'spidr_test/server'
   autoload :Capturer, 'spidr_test/capturer'
 
-  SUCCESS_HANDLER = ->(page){}
-  FAILURE_HANDLER = ->(page){ raise "Failure on #{page.url.path}: #{page.body}" }
-  ERROR_HANDLER = ->(url) { raise "Cannot connect to #{url.path}" }
+  attr_accessor :app, :spidr, :path, :context,
+                :test_define, :success_handler, :failure_handler, :error_handler
 
-  attr_accessor :app, :spidr, :path
+  DEFAULTS = {
+    path: '/'.freeze,
+    success_handler: ->(url, page) { },
+    failure_handler: ->(url, page) { raise "Failure on #{url.path}: #{page.body}" },
+    error_handler: ->(url, page) { raise "Cannot connect to #{url.path}" },
+    test_define: ->(url, &block) { block.call },
+  }.freeze
 
   def self.crawl(options = {}, &block)
     spidr_test = SpidrTest.new(options, &block)
@@ -17,12 +22,9 @@ class SpidrTest
 
   def initialize(options)
     @spidr = Capturer.new
-    @path = '/'
-    @success_handler = SUCCESS_HANDLER
-    @failure_handler = FAILURE_HANDLER
-    @error_handler = ERROR_HANDLER
 
-    options.each do |key, val|
+    collated_options = DEFAULTS.dup.merge!(options)
+    collated_options.each do |key, val|
       self.send("#{key}=", val)
     end
 
@@ -30,17 +32,25 @@ class SpidrTest
   end
 
   def crawl!
+    test = self
     capturer = self.spidr
     Server.run(app) do |server|
       Spidr.site(server.url + path) do |spidr|
         capturer._invoke(spidr)
 
-        spidr.every_failed_url(&@error_handler)
+        spidr.every_failed_url do |url|
+          @test_define.call(url) do
+            test.error_handler.call(url, nil)
+          end
+        end
+
         spidr.every_page do |page|
-          if page.code < 500
-            @success_handler.call(page)
-          else
-            @failure_handler.call(page)
+          @test_define.call(page.url) do
+            if page.code < 500
+              test.success_handler.call(page.url, page)
+            else
+              test.failure_handler.call(page.url, page)
+            end
           end
         end
       end
@@ -49,28 +59,8 @@ class SpidrTest
 
   def context=(context)
     @context = context
-    success do |page|
-      context.specify(page.url.path) { SUCCESS_HANDLER.call(page) }
+    @test_define = ->(url, &block) do
+      context.specify(url.path, &block)
     end
-
-    failure do |page|
-      context.specify(page.url.path) { FAILURE_HANDLER.call(page) }
-    end
-
-    error do |url|
-      context.specify(page.url.path) { ERROR_HANDLER.call(page) }
-    end
-  end
-
-  def success(&block)
-    @success_handler = block
-  end
-
-  def failure(&block)
-    @failure_handler = block
-  end
-
-  def error(&block)
-    @error_handler = block
   end
 end
