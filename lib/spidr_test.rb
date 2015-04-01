@@ -3,7 +3,7 @@ require 'spidr'
 class SpidrTest
   autoload :Server, 'spidr_test/server'
   autoload :Capturer, 'spidr_test/capturer'
-  autoload :MinitestHandler, 'spidr_test/minitest_handler'
+  autoload :ContextHandlers, 'spidr_test/context_handlers'
 
   attr_accessor :app, :path, :url, :spidr, :context,
                 :success_handler, :failure_handler, :error_handler
@@ -48,9 +48,11 @@ class SpidrTest
   def context=(context)
     @context = context
 
-    case context
-      when MinitestHandler then apply MinitestHandler.new(context)
-      else $stderr.puts "SpidrTest: context not understood. Using default handlers."
+    handler = ContextHandlers.for(context)
+    if handler
+      apply handler
+    else
+      $stderr.puts "SpidrTest: context not understood. Using default handlers."
     end
   end
 
@@ -73,7 +75,7 @@ class SpidrTest
   end
 
   def failed_url(url)
-    context.instance_exec(page.url, page, &error_handler)
+    context.instance_exec(url, nil, &error_handler)
   end
 
   def check_page(page)

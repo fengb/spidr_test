@@ -1,7 +1,7 @@
-class SpidrTest
-  class MinitestHandler
-    def self.===(context)
-      defined?(Minitest) && context.is_a?(Minitest::Test)
+if defined?(::Minitest::Test)
+  class SpidrTest::ContextHandlers::Minitest
+    def self.handle?(context)
+      context.is_a?(::Minitest::Test)
     end
 
     def initialize(context)
@@ -21,8 +21,8 @@ class SpidrTest
     end
 
     def assertion(msg)
-      raise MiniTest::Assertion.new(msg)
-    rescue Minitest::Assertion => e
+      raise ::MiniTest::Assertion.new(msg)
+    rescue ::Minitest::Assertion => e
       return e
     end
   end
