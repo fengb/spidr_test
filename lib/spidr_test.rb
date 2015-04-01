@@ -3,9 +3,10 @@ require 'spidr'
 class SpidrTest
   autoload :Server, 'spidr_test/server'
   autoload :Capturer, 'spidr_test/capturer'
+  autoload :MinitestHandler, 'spidr_test/minitest_handler'
 
   attr_accessor :app, :path, :url, :spidr, :context,
-                :test_define, :success_handler, :failure_handler, :error_handler
+                :success_handler, :failure_handler, :error_handler
 
   DEFAULT = {
     path: '/'.freeze,
@@ -47,30 +48,19 @@ class SpidrTest
   def context=(context)
     @context = context
 
-    if defined?(Minitest) && context.is_a?(Minitest::Test)
-      @success_handler = ->(url, page) do
-        pass url.path
-      end
-
-      @failure_handler = ->(url, page) do
-        begin
-          raise Minitest::Assertion.new("Failure on #{url.path}: #{page.body}")
-        rescue Minitest::Assertion => e
-          self.failures << e
-        end
-      end
-
-      @error_handler = ->(url, page) do
-        begin
-          raise Minitest::Assertion.new("Cannot connect to #{url.path}")
-        rescue Minitest::Assertion => e
-          self.failures << e
-        end
-      end
+    case context
+      when MinitestHandler then apply MinitestHandler.new(context)
+      else $stderr.puts "SpidrTest: context not understood. Using default handlers."
     end
   end
 
   private
+
+  def apply(handler)
+    @success_handler = handler.method(:success)
+    @failure_handler = handler.method(:failure)
+    @error_handler = handler.method(:error)
+  end
 
   def crawl_url!(url)
     capturer = self.spidr
