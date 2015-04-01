@@ -47,21 +47,37 @@ class SpidrTest
   def context=(context)
     @context = context
 
-      if defined?(Minitest) && context.is_a?(Minitest::Test)
-        @success_handler = ->(url, page) do
-          pass url.path
-        end
-      else
-        @success_handler = ->(url, page) do
-          context.specify(url.path){}
-        end
+    if defined?(Minitest) && context.is_a?(Minitest::Test)
+      @success_handler = ->(url, page) do
+        pass url.path
+      end
 
-        @failure_handler = ->(url, page) do
-          context.specify(url.path) do
-            DEFAULT[:failure_handler].call(url, page)
-          end
+      @failure_handler = ->(url, page) do
+        begin
+          raise Minitest::Assertion.new("Failure on #{url.path}: #{page.body}")
+        rescue Minitest::Assertion => e
+          self.failures << e
         end
       end
+
+      @error_handler = ->(url, page) do
+        begin
+          raise Minitest::Assertion.new("Cannot connect to #{url.path}")
+        rescue Minitest::Assertion => e
+          self.failures << e
+        end
+      end
+    else
+      @success_handler = ->(url, page) do
+        context.specify(url.path){}
+      end
+
+      @failure_handler = ->(url, page) do
+        context.specify(url.path) do
+          DEFAULT[:failure_handler].call(url, page)
+        end
+      end
+    end
   end
 
   private

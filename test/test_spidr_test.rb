@@ -6,4 +6,12 @@ class TestSpidrTest < Minitest::Test
     SpidrTest.crawl app: TestRackApp,
                     context: self
   end
+
+=begin
+  def test_with_500
+    SpidrTest.crawl app: TestRackApp,
+                    path: '/with-500',
+                    context: self
+  end
+=end
 end
