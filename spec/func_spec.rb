@@ -8,6 +8,7 @@ RSpec.describe SpidrTest, 'func' do
                       context: self
     end
 
+=begin
     context '/with-500' do
       SpidrTest.crawl app: TestRackApp,
                       path: '/with-500',
@@ -17,6 +18,7 @@ RSpec.describe SpidrTest, 'func' do
                         SpidrTest::DEFAULT[:failure_handler].call(url, page)
                       end
     end
+=end
   end
 
   context 'http://example.com' do

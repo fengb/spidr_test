@@ -12,7 +12,6 @@ class SpidrTest
     success_handler: ->(url, page) { },
     failure_handler: ->(url, page) { raise "Failure on #{url.path}: #{page.body}" },
     error_handler: ->(url, page) { raise "Cannot connect to #{url.path}" },
-    test_define: ->(url, &block) { block.call },
   }.freeze
 
   def self.crawl(options = {}, &block)
@@ -47,9 +46,22 @@ class SpidrTest
 
   def context=(context)
     @context = context
-    @test_define = ->(url, &block) do
-      context.specify(url.path, &block)
-    end
+
+      if defined?(Minitest) && context.is_a?(Minitest::Test)
+        @success_handler = ->(url, page) do
+          pass url.path
+        end
+      else
+        @success_handler = ->(url, page) do
+          context.specify(url.path){}
+        end
+
+        @failure_handler = ->(url, page) do
+          context.specify(url.path) do
+            DEFAULT[:failure_handler].call(url, page)
+          end
+        end
+      end
   end
 
   private
@@ -65,20 +77,14 @@ class SpidrTest
   end
 
   def failed_url(url)
-    error_handler = @error_handler
-    @test_define.call(url) do
-      error_handler.call(url, nil)
-    end
+    context.instance_exec(page.url, page, &error_handler)
   end
 
   def check_page(page)
-    test = self
-    @test_define.call(page.url) do
-      if test.success?(page)
-        self.instance_exec(page.url, page, &test.success_handler)
-      else
-        self.instance_exec(page.url, page, &test.failure_handler)
-      end
+    if success?(page)
+      context.instance_exec(page.url, page, &success_handler)
+    else
+      context.instance_exec(page.url, page, &failure_handler)
     end
   end
 end

@@ -1,11 +1,9 @@
 require 'minitest_helper'
+require 'spidr_test'
 
 class TestSpidrTest < Minitest::Test
-  def test_that_it_has_a_version_number
-    refute_nil ::SpidrTest::VERSION
-  end
-
-  def test_it_does_something_useful
-    assert false
+  def test_root
+    SpidrTest.crawl app: TestRackApp,
+                    context: self
   end
 end
