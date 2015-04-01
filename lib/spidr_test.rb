@@ -4,10 +4,10 @@ class SpidrTest
   autoload :Server, 'spidr_test/server'
   autoload :Capturer, 'spidr_test/capturer'
 
-  attr_accessor :app, :spidr, :path, :context,
+  attr_accessor :app, :path, :url, :spidr, :context,
                 :test_define, :success_handler, :failure_handler, :error_handler
 
-  DEFAULTS = {
+  DEFAULT = {
     path: '/'.freeze,
     success_handler: ->(url, page) { },
     failure_handler: ->(url, page) { raise "Failure on #{url.path}: #{page.body}" },
@@ -23,7 +23,7 @@ class SpidrTest
   def initialize(options)
     @spidr = Capturer.new
 
-    collated_options = DEFAULTS.dup.merge!(options)
+    collated_options = DEFAULT.dup.merge!(options)
     collated_options.each do |key, val|
       self.public_send("#{key}=", val)
     end
@@ -33,12 +33,21 @@ class SpidrTest
 
   def crawl!
     capturer = self.spidr
-    Server.run(app) do |server|
-      Spidr.site(server.url + path) do |spidr|
+    if @url
+      Spidr.site(@url) do |spidr|
         capturer._invoke(spidr)
 
         spidr.every_failed_url(&method(:failed_url))
         spidr.every_page(&method(:check_page))
+      end
+    else
+      Server.run(app) do |server|
+        Spidr.site(server.url + path) do |spidr|
+          capturer._invoke(spidr)
+
+          spidr.every_failed_url(&method(:failed_url))
+          spidr.every_page(&method(:check_page))
+        end
       end
     end
   end
