@@ -17,6 +17,11 @@ class TestRackApp < Sinatra::Base
 
   get '/status/:code' do
     status params[:code]
-    body params[:code].capitalize
+    body params[:code]
+  end
+
+  not_found do
+    status 500
+    body "Hitting unconfigured path: #{request.path_info}"
   end
 end

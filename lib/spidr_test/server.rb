@@ -1,7 +1,10 @@
 require 'rack'
+require 'webrick/log'
 
 class SpidrTest
   class Server
+    NULL_LOGGER = WEBrick::Log.new(File::NULL)
+
     def self.servers
       @servers ||= {}
     end
@@ -50,7 +53,7 @@ class SpidrTest
       mutex = Mutex.new
       server_ready = ConditionVariable.new
       @thread = Thread.new do
-        Rack::Handler::WEBrick.run(@app, Port: @port, Logger: null_logger, AccessLog: []) do
+        Rack::Handler::WEBrick.run(@app, Port: @port, Logger: NULL_LOGGER, AccessLog: []) do
           mutex.synchronize { server_ready.signal }
         end
       end
@@ -58,12 +61,9 @@ class SpidrTest
       mutex.synchronize { server_ready.wait(mutex) }
     end
 
-    def null_logger
-      @null_logger ||= WEBrick::Log.new(File::NULL)
-    end
-
     def stop!
       @thread.kill
+      @thread.join
     end
   end
 end
