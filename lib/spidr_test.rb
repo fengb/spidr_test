@@ -33,7 +33,7 @@ class SpidrTest
 
   def crawl!
     if @url
-      crawl_url!(url)
+      crawl_url!(@url)
     else
       Server.run(app) do |server|
         crawl_url!(server.url + path)
