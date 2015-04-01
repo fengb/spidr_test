@@ -25,7 +25,7 @@ class SpidrTest
 
     collated_options = DEFAULTS.dup.merge!(options)
     collated_options.each do |key, val|
-      self.send("#{key}=", val)
+      self.public_send("#{key}=", val)
     end
 
     yield self if block_given?
@@ -46,7 +46,7 @@ class SpidrTest
 
         spidr.every_page do |page|
           @test_define.call(page.url) do
-            if page.code < 500
+            if test.success?(page)
               test.success_handler.call(page.url, page)
             else
               test.failure_handler.call(page.url, page)
@@ -55,6 +55,10 @@ class SpidrTest
         end
       end
     end
+  end
+
+  def success?(page)
+    page.code < 500
   end
 
   def context=(context)
