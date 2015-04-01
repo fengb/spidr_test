@@ -67,16 +67,6 @@ class SpidrTest
           self.failures << e
         end
       end
-    else
-      @success_handler = ->(url, page) do
-        context.specify(url.path){}
-      end
-
-      @failure_handler = ->(url, page) do
-        context.specify(url.path) do
-          DEFAULT[:failure_handler].call(url, page)
-        end
-      end
     end
   end
 

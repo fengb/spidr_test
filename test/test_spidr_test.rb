@@ -14,4 +14,9 @@ class TestSpidrTest < Minitest::Test
                     context: self
   end
 =end
+
+  def test_example_com
+    SpidrTest.crawl url: 'http://example.com',
+                    context: self
+  end
 end
