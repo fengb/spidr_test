@@ -11,8 +11,8 @@ class SpidrTest
   DEFAULT = {
     path: '/'.freeze,
     success_handler: ->(url, page) { },
-    failure_handler: ->(url, page) { raise "Failure on #{url.path}: #{page.body}" },
-    error_handler: ->(url, page) { raise "Cannot connect to #{url.path}" },
+    failure_handler: ->(url, page) { raise "Failure on #{url}: #{page.body}" },
+    error_handler: ->(url, page) { raise "Cannot connect to #{url}" },
   }.freeze
 
   def self.crawl(options = {}, &block)

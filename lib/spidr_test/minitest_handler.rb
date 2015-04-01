@@ -9,23 +9,21 @@ class SpidrTest
     end
 
     def success(url, page)
-      @context.pass url.path
+      @context.pass url
     end
 
     def failure(url, page)
-      begin
-        raise Minitest::Assertion.new("Failure on #{url.path}: #{page.body}")
-      rescue Minitest::Assertion => e
-        @context.failures << e
-      end
+      @context.failures << assertion("Failure on #{url}: #{page.body}")
     end
 
     def error(url, page)
-      begin
-        raise Minitest::Assertion.new("Cannot connect to #{url.path}")
-      rescue Minitest::Assertion => e
-        self.failures << e
-      end
+      @context.failures << assertion("Cannot connect to #{url}")
+    end
+
+    def assertion(msg)
+      raise MiniTest::Assertion.new(msg)
+    rescue Minitest::Assertion => e
+      return e
     end
   end
 end
