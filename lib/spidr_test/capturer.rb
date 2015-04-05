@@ -1,5 +1,3 @@
-require 'spidr'
-
 class SpidrTest
   class Capturer < BasicObject
     def initialize
