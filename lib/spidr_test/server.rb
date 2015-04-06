@@ -12,7 +12,7 @@ class SpidrTest
     def self.start(app)
       if servers[app]
         $stderr.puts "Already started server for #{app}"
-        return
+        return servers[app]
       end
 
       servers[app] = self.new(app)
@@ -27,6 +27,7 @@ class SpidrTest
       end
 
       server.stop!
+      servers.delete(app)
     end
 
     def self.run(app)
@@ -45,7 +46,11 @@ class SpidrTest
     end
 
     def url
-      "http://localhost:#{@thread[:port]}"
+      if @thread && @thread[:port]
+        "http://localhost:#{@thread[:port]}"
+      else
+        nil
+      end
     end
 
     def start!
