@@ -7,7 +7,9 @@ class SpidrTest
           return constant.new(context)
         end
       end
-      nil
+
+      $stderr.puts "SpidrTest: context not understood. Using default handlers."
+      ContextHanders::Nil.new(nil)
     end
   end
 end

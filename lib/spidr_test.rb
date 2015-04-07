@@ -45,14 +45,7 @@ class SpidrTest
 
   def context=(context)
     @context = context
-
-    handler = ContextHandlers.for(context)
-    if handler
-      apply handler
-    else
-      $stderr.puts "SpidrTest: context not understood. Using default handlers."
-      apply ContextHandler::Nil.new(context)
-    end
+    apply ContextHandlers.for(context)
   end
 
   private
