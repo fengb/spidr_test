@@ -6,11 +6,15 @@ class SpidrTest
   autoload :ContextHandlers, 'spidr_test/context_handlers'
 
   attr_accessor :app, :path, :url, :context, :spidr,
+                :success_message, :failure_message, :error_message,
                 :success_handler, :failure_handler, :error_handler
 
   DEFAULT = {
     path: '/'.freeze,
     context: nil,
+    success_message: ->(url, page){ url.path },
+    failure_message: ->(url, page){ "Failure on #{url.path}: #{page.body}" },
+    error_message:   ->(url, page){ "Cannot connect to #{url}" },
   }.freeze
 
   def self.crawl(options = {}, &block)
@@ -70,7 +74,7 @@ class SpidrTest
     options = {
       url: url,
       page: nil,
-      message: "Cannot connect to #{url}",
+      message: error_message.call(url, nil),
     }
     context.instance_exec(options, &error_handler)
   end
@@ -80,14 +84,14 @@ class SpidrTest
       options = {
         url: page.url,
         page: page,
-        message: '',
+        message: success_message.call(page.url, page),
       }
       context.instance_exec(options, &success_handler)
     else
       options = {
         url: page.url,
         page: page,
-        message: "Failure on #{page.url.path}: #{page.body}",
+        message: failure_message.call(page.url, page),
       }
       context.instance_exec(options, &failure_handler)
     end
