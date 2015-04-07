@@ -1,5 +1,5 @@
 if defined?(::Minitest::Test)
-  class SpidrTest::ContextHandlers::Minitest
+  class SpidrTest::Handlers::Minitest
     def self.handle?(context)
       context.is_a?(::Minitest::Test)
     end

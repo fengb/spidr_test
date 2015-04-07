@@ -3,11 +3,10 @@ require 'spidr'
 class SpidrTest
   autoload :Server, 'spidr_test/server'
   autoload :Capturer, 'spidr_test/capturer'
-  autoload :ContextHandlers, 'spidr_test/context_handlers'
+  autoload :Handlers, 'spidr_test/handlers'
 
-  attr_accessor :app, :path, :url, :context, :spidr,
-                :success_message, :failure_message, :error_message,
-                :success_handler, :failure_handler, :error_handler
+  attr_accessor :app, :path, :url, :context, :spidr, :handler,
+                :success_message, :failure_message, :error_message
 
   DEFAULT = {
     path: '/'.freeze,
@@ -49,16 +48,10 @@ class SpidrTest
 
   def context=(context)
     @context = context
-    apply ContextHandlers.for(context)
+    @handler = Handlers.for(context)
   end
 
   private
-
-  def apply(handler)
-    @success_handler = handler.method(:success)
-    @failure_handler = handler.method(:failure)
-    @error_handler = handler.method(:error)
-  end
 
   def crawl_url!(url)
     capturer = self.spidr
@@ -71,29 +64,29 @@ class SpidrTest
   end
 
   def failed_url(url)
-    options = {
+    handler.error(
       url: url,
+      path: url.path,
       page: nil,
       message: error_message.call(url, nil),
-    }
-    context.instance_exec(options, &error_handler)
+    )
   end
 
   def check_page(page)
     if success?(page)
-      options = {
+      handler.success(
         url: page.url,
+        path: page.url.path,
         page: page,
         message: success_message.call(page.url, page),
-      }
-      context.instance_exec(options, &success_handler)
+      )
     else
-      options = {
+      handler.failure(
         url: page.url,
+        path: page.url.path,
         page: page,
         message: failure_message.call(page.url, page),
-      }
-      context.instance_exec(options, &failure_handler)
+      )
     end
   end
 end

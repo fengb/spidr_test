@@ -45,17 +45,17 @@ RSpec.describe SpidrTest do
   end
 
   it 'handles successes and failures' do
-    successes = []
-    failures = []
-
+    handler = SpyHandler.new
     SpidrTest.crawl(
       app: TestRackApp,
       path: '/with-500',
-      success_handler: ->(options) { successes << options[:url].path },
-      failure_handler: ->(options) { failures << options[:url].path },
+      handler: handler,
     )
 
-    expect(successes).to include('/status/200', '/status/404')
-    expect(failures).to include('/status/500')
+    success_paths = handler.success_calls.map { |options| options[:path] }
+    expect(success_paths).to include('/status/200', '/status/404')
+
+    failure_paths = handler.failure_calls.map { |options| options[:path] }
+    expect(failure_paths).to include('/status/500')
   end
 end

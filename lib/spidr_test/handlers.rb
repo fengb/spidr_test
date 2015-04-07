@@ -1,5 +1,5 @@
 class SpidrTest
-  module ContextHandlers
+  module Handlers
     def self.for(context)
       constants.each do |const_name|
         constant = const_get(const_name)
@@ -14,6 +14,6 @@ class SpidrTest
   end
 end
 
-require_relative 'context_handlers/nil'
-require_relative 'context_handlers/minitest'
-require_relative 'context_handlers/rspec'
+require_relative 'handlers/nil'
+require_relative 'handlers/minitest'
+require_relative 'handlers/rspec'
