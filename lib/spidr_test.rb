@@ -10,9 +10,7 @@ class SpidrTest
 
   DEFAULT = {
     path: '/'.freeze,
-    success_handler: ->(url, page, msg) { },
-    failure_handler: ->(url, page, msg) { raise msg },
-    error_handler: ->(url, page, msg) { raise msg },
+    context: nil,
   }.freeze
 
   def self.crawl(options = {}, &block)
@@ -53,6 +51,7 @@ class SpidrTest
       apply handler
     else
       $stderr.puts "SpidrTest: context not understood. Using default handlers."
+      apply ContextHandler::Nil.new(context)
     end
   end
 

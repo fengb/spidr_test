@@ -12,5 +12,6 @@ class SpidrTest
   end
 end
 
+require_relative 'context_handlers/nil'
 require_relative 'context_handlers/minitest'
 require_relative 'context_handlers/rspec'
