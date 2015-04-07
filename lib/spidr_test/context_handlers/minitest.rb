@@ -8,19 +8,19 @@ if defined?(::Minitest::Test)
       @context = context
     end
 
-    def success(url, page, msg)
-      @context.pass url
+    def success(options)
+      @context.pass options[:message]
     end
 
-    def failure(url, page, msg)
-      @context.failures << assertion(msg)
+    def failure(options)
+      @context.failures << create_assertion(options[:message])
     end
 
-    def error(url, page, msg)
-      @context.failures << assertion(msg)
+    def error(options)
+      @context.failures << create_assertion(options[:message])
     end
 
-    def assertion(msg)
+    def create_assertion(msg)
       raise ::MiniTest::Assertion.new(msg)
     rescue ::Minitest::Assertion => e
       return e

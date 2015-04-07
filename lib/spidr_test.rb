@@ -74,17 +74,29 @@ class SpidrTest
   end
 
   def failed_url(url)
-    msg = "Cannot connect to #{url}"
-    context.instance_exec(url, nil, msg, &error_handler)
+    options = {
+      url: url,
+      page: nil,
+      message: "Cannot connect to #{url}",
+    }
+    context.instance_exec(options, &error_handler)
   end
 
   def check_page(page)
     if success?(page)
-      msg = ''
-      context.instance_exec(page.url, page, msg, &success_handler)
+      options = {
+        url: page.url,
+        page: page,
+        message: '',
+      }
+      context.instance_exec(options, &success_handler)
     else
-      msg = "Failure on #{page.url.path}: #{page.body}"
-      context.instance_exec(page.url, page, msg, &failure_handler)
+      options = {
+        url: page.url,
+        page: page,
+        message: "Failure on #{page.url.path}: #{page.body}",
+      }
+      context.instance_exec(options, &failure_handler)
     end
   end
 end

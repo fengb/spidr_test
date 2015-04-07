@@ -6,14 +6,14 @@ class SpidrTest::ContextHandlers::Nil
   def initialize(context)
   end
 
-  def success(url, page, msg)
+  def success(options)
   end
 
-  def failure(url, page, msg)
-    raise msg
+  def failure(options)
+    raise options[:message]
   end
 
-  def error(url, page, msg)
-    raise msg
+  def error(options)
+    raise options[:message]
   end
 end
