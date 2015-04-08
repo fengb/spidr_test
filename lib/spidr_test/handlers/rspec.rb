@@ -1,4 +1,4 @@
-# FIXME: make RSpec actually useful
+# FIXME: actually report RSpec style
 
 if defined?(::RSpec::Core::ExampleGroup)
   require_relative 'base'
