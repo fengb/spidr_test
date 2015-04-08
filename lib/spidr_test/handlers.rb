@@ -9,11 +9,11 @@ class SpidrTest
       end
 
       $stderr.puts "SpidrTest: context not understood. Using default handlers."
-      ContextHanders::Nil.new(nil)
+      ContextHanders::Default.new(nil)
     end
   end
 end
 
-require_relative 'handlers/nil'
+require_relative 'handlers/default'
 require_relative 'handlers/minitest'
 require_relative 'handlers/rspec'

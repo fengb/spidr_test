@@ -1,4 +1,4 @@
-class SpidrTest::Handlers::Nil
+class SpidrTest::Handlers::Default
   def self.handle?(context)
     context.nil?
   end
