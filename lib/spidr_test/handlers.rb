@@ -9,7 +9,7 @@ module SpidrTest
       end
 
       $stderr.puts "SpidrTest: context not understood. Using default handlers."
-      ContextHanders::Default.new(nil)
+      Handlers::Default.new(nil)
     end
   end
 end
