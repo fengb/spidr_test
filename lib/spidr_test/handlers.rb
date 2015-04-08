@@ -1,3 +1,7 @@
+require_relative 'handlers/base'
+require_relative 'handlers/minitest'
+require_relative 'handlers/rspec'
+
 module SpidrTest
   module Handlers
     def self.for(context)
@@ -9,11 +13,7 @@ module SpidrTest
       end
 
       $stderr.puts "SpidrTest: context not understood. Using default handlers."
-      Handlers::Default.new(nil)
+      Handlers::Base.new(nil)
     end
   end
 end
-
-require_relative 'handlers/default'
-require_relative 'handlers/minitest'
-require_relative 'handlers/rspec'

@@ -1,10 +1,15 @@
-# FIXME: make RSpec actually useful (and not extend Default handler)
-require_relative 'default'
+# FIXME: make RSpec actually useful
 
 if defined?(::RSpec::Core::ExampleGroup)
-  class SpidrTest::Handlers::RSpec < SpidrTest::Handlers::Default
-    def self.handle?(context)
-      context.is_a?(::RSpec::Core::ExampleGroup)
+  require_relative 'base'
+
+  module SpidrTest
+    module Handlers
+      class RSpec < Base
+        def self.handle?(context)
+          context.is_a?(::RSpec::Core::ExampleGroup)
+        end
+      end
     end
   end
 end
