@@ -1,4 +1,4 @@
-class SpidrTest
+module SpidrTest
   class Capturer < BasicObject
     def initialize
       @invocations = []

@@ -1,7 +1,7 @@
 require 'rack'
 require 'webrick/log'
 
-class SpidrTest
+module SpidrTest
   class Server
     NULL_LOGGER = WEBrick::Log.new(File::NULL)
 

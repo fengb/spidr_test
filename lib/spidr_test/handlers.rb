@@ -1,4 +1,4 @@
-class SpidrTest
+module SpidrTest
   module Handlers
     def self.for(context)
       constants.each do |const_name|
