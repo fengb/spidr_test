@@ -83,20 +83,17 @@ module SpidrTest
     end
 
     def check_page(page)
+      options = {
+        url: page.url,
+        path: page.url.path,
+        page: page,
+        message: message(page),
+      }
+
       if success?(page) ^ expected_failure?(page)
-        handler.success(
-          url: page.url,
-          path: page.url.path,
-          page: page,
-          message: message(page),
-        )
+        handler.success(options)
       else
-        handler.failure(
-          url: page.url,
-          path: page.url.path,
-          page: page,
-          message: message(page),
-        )
+        handler.failure(options)
       end
     end
   end
