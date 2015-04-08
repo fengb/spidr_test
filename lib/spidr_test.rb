@@ -6,11 +6,13 @@ class SpidrTest
   autoload :Handlers, 'spidr_test/handlers'
 
   attr_accessor :app, :path, :url, :context, :spidr, :handler,
+                :expected_fail_paths,
                 :success_message, :failure_message, :error_message
 
   DEFAULT = {
     path: '/'.freeze,
     context: nil,
+    expected_fail_paths: [],
     success_message: ->(url, page){ url.path },
     failure_message: ->(url, page){ "Failure on #{url.path}: #{page.body}" },
     error_message:   ->(url, page){ "Cannot connect to #{url}" },
@@ -46,6 +48,18 @@ class SpidrTest
     page.code < 500
   end
 
+  def expected_failure?(page)
+    expected_fail_paths.include?(page.url.path)
+  end
+
+  def message(page)
+    if success?(page)
+      success_message.call(page.url, page)
+    else
+      failure_message.call(page.url, page)
+    end
+  end
+
   def context=(context)
     @context = context
     @handler = Handlers.for(context)
@@ -73,19 +87,19 @@ class SpidrTest
   end
 
   def check_page(page)
-    if success?(page)
+    if success?(page) ^ expected_failure?(page)
       handler.success(
         url: page.url,
         path: page.url.path,
         page: page,
-        message: success_message.call(page.url, page),
+        message: message(page),
       )
     else
       handler.failure(
         url: page.url,
         path: page.url.path,
         page: page,
-        message: failure_message.call(page.url, page),
+        message: message(page),
       )
     end
   end

@@ -12,7 +12,7 @@ class TestRackApp < Sinatra::Base
   end
 
   get '/with-500' do
-    links('/status/200', '/status/404', '/status/500', '/status/501')
+    links('/status/200', '/status/404', '/status/500')
   end
 
   get '/status/:code' do

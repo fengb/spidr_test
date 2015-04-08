@@ -8,13 +8,12 @@ RSpec.describe SpidrTest, 'func' do
                       context: self
     end
 
-=begin
     specify '/with-500' do
       SpidrTest.crawl app: TestRackApp,
                       path: '/with-500',
-                      context: self
+                      context: self,
+                      expected_fail_paths: ['/status/500']
     end
-=end
   end
 
   specify 'http://example.com' do

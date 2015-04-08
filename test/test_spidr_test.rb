@@ -7,13 +7,12 @@ class TestSpidrTest < Minitest::Test
                     context: self
   end
 
-=begin
   def test_with_500
     SpidrTest.crawl app: TestRackApp,
                     path: '/with-500',
-                    context: self
+                    context: self,
+                    expected_fail_paths: ['/status/500']
   end
-=end
 
   def test_example_com
     SpidrTest.crawl url: 'http://example.com',
