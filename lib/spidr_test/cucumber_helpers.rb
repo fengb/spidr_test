@@ -1,4 +1,7 @@
-require 'spidr_test'
+module SpidrTest
+  module CucumberHelpers
+  end
+end
 
 Given 'SpidrTest is crawling "$app" starting at "$path"' do |app_name, path|
   @spidr_test_options ||= {}
