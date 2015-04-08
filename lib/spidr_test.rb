@@ -26,7 +26,7 @@ class SpidrTest
   def initialize(options)
     @spidr = Capturer.new
 
-    collated_options = DEFAULT.dup.merge!(options)
+    collated_options = DEFAULT.merge(options)
     collated_options.each do |key, val|
       self.public_send("#{key}=", val)
     end
